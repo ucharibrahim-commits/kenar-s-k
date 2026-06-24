@@ -1,0 +1,37 @@
+name: Android APK Derleyici
+
+on:
+  push:
+    branches: [ "main", "ana" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Kodları Çek
+      uses: actions/checkout@v4
+
+    - name: Zip Dosyasını Bul ve Aç
+      run: |
+        find . -name "*.zip" -exec unzip -o {} -d . \;
+        ls -la
+
+    - name: Java Ayarla
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+
+    - name: Gradle Wrapper Kontrol Et ve Çalıştır
+      run: |
+        cd edgeglow-rgb-notifications || true
+        chmod +x gradlew || true
+        ./gradlew assembleDebug || true
+
+    - name: APK Dosyasını Çıkart
+      uses: actions/upload-artifact@v4
+      with:
+        name: EdgeGlow-Uygulamam
+        path: "**/*.apk"
